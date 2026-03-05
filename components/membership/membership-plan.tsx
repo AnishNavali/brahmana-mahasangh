@@ -57,7 +57,7 @@ const MEMBERSHIP_PLANS: MembershipPlan[] = [
     type: 'premium',
     name: 'Premium',
     price: 360,
-    billingPeriod: '/year',
+    billingPeriod: '/3years',
     description: 'Enhanced engagement for serious networkers',
     benefits: [
       'Access to community events',

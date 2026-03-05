@@ -164,12 +164,17 @@ export default function PaymentScreen({ membershipData }: PaymentScreenProps) {
         // Store transaction data
         if (typeof window !== "undefined") {
           const existingData = localStorage.getItem("selectedMembership");
+          const registrationData = localStorage.getItem("registrationData");
+
           if (existingData) {
-            const parsedData = JSON.parse(existingData);
+            const parsedPlanData = JSON.parse(existingData);
+            const parsedRegData = registrationData ? JSON.parse(registrationData) : {};
+
             localStorage.setItem(
               "membershipComplete",
               JSON.stringify({
-                ...parsedData,
+                ...parsedRegData,      // Include all registration details (firstName, lastName, gotra, photo, phone, email, etc.)
+                ...parsedPlanData,     // Include plan details (membershipType, membershipPlan, membershipPrice)
                 transactionId,
                 paymentMethod,
                 paymentDate: new Date().toISOString(),
@@ -256,18 +261,16 @@ export default function PaymentScreen({ membershipData }: PaymentScreenProps) {
                       return newErrors;
                     });
                   }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    paymentMethod === "card"
+                  className={`p-4 rounded-lg border-2 transition-all ${paymentMethod === "card"
                       ? "border-blue-600 bg-blue-50"
                       : "border-gray-200 hover:border-gray-300"
-                  }`}
+                    }`}
                 >
                   <CreditCard
-                    className={`mx-auto mb-2 ${
-                      paymentMethod === "card"
+                    className={`mx-auto mb-2 ${paymentMethod === "card"
                         ? "text-blue-600"
                         : "text-gray-400"
-                    }`}
+                      }`}
                     size={24}
                   />
                   <div className="text-sm font-medium text-gray-900">
@@ -285,18 +288,16 @@ export default function PaymentScreen({ membershipData }: PaymentScreenProps) {
                       return newErrors;
                     });
                   }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    paymentMethod === "upi"
+                  className={`p-4 rounded-lg border-2 transition-all ${paymentMethod === "upi"
                       ? "border-blue-600 bg-blue-50"
                       : "border-gray-200 hover:border-gray-300"
-                  }`}
+                    }`}
                 >
                   <Smartphone
-                    className={`mx-auto mb-2 ${
-                      paymentMethod === "upi"
+                    className={`mx-auto mb-2 ${paymentMethod === "upi"
                         ? "text-blue-600"
                         : "text-gray-400"
-                    }`}
+                      }`}
                     size={24}
                   />
                   <div className="text-sm font-medium text-gray-900">UPI</div>
@@ -312,18 +313,16 @@ export default function PaymentScreen({ membershipData }: PaymentScreenProps) {
                       return newErrors;
                     });
                   }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    paymentMethod === "bank"
+                  className={`p-4 rounded-lg border-2 transition-all ${paymentMethod === "bank"
                       ? "border-blue-600 bg-blue-50"
                       : "border-gray-200 hover:border-gray-300"
-                  }`}
+                    }`}
                 >
                   <Building2
-                    className={`mx-auto mb-2 ${
-                      paymentMethod === "bank"
+                    className={`mx-auto mb-2 ${paymentMethod === "bank"
                         ? "text-blue-600"
                         : "text-gray-400"
-                    }`}
+                      }`}
                     size={24}
                   />
                   <div className="text-sm font-medium text-gray-900">

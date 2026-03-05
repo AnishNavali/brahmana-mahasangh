@@ -16,26 +16,41 @@ import {
 } from '@/components/ui/select';
 
 export interface MembershipData {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   dateOfBirth: string;
   gender: string;
-  mobileNumber: string;
+  phone: string;
   email: string;
   address: string;
-  gothra: string;
+  gotra: string;
   profilePhoto: File | null;
 }
+
+const GOTRAS = [
+  "Bharadwaj", "Kashyap", "Vasishta", "Vishwamitra", "Atri", "Gautam", "Jamadagni",
+  "Agastya", "Bhrigu", "Angirasa", "Marichi", "Pulastya", "Pulaha", "Kratu",
+  "Shandilya", "Parashara", "Kaushik", "Harita", "Koundinya", "Maitreya",
+  "Upamanyu", "Mudgal", "Garga", "Katyayana", "Shaunak", "Galava", "Lomasha",
+  "Mandavya", "Shukla", "Devadatta", "Kapila", "Vamadeva", "Vyasa", "Sankruti",
+  "Savarna", "Badarayana", "Dhananjaya", "Dadhichi", "Rishyasringa", "Nityananda",
+  "Srivatsa", "Satyashraya", "Athreya", "Vadhoola", "Sankhyayana", "Kapi",
+  "Bhargava", "Maudgalya", "Hiranyakeshi", "Chandratreya", "Vatsa", "Romasha",
+  "Kutsasa", "Shalankayana", "Agniveshya", "Trivikrama", "Yajnavalkya", "Sabarna",
+  "Other"
+].sort();
 
 export default function RegistrationForm() {
   const router = useRouter();
   const [formData, setFormData] = useState<MembershipData>({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     dateOfBirth: '',
     gender: '',
-    mobileNumber: '',
+    phone: '',
     email: '',
     address: '',
-    gothra: '',
+    gotra: '',
     profilePhoto: null,
   });
 
@@ -45,14 +60,16 @@ export default function RegistrationForm() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
     if (!formData.gender) newErrors.gender = 'Gender is required';
-    if (!formData.mobileNumber.trim()) newErrors.mobileNumber = 'Mobile number is required';
-    if (!/^[0-9]{10}$/.test(formData.mobileNumber.replace(/\s/g, ''))) {
-      newErrors.mobileNumber = 'Please enter a valid 10-digit mobile number';
+    if (!formData.phone.trim()) newErrors.phone = 'Mobile number is required';
+    if (!/^[0-9]{10}$/.test(formData.phone.replace(/\s/g, ''))) {
+      newErrors.phone = 'Please enter a valid 10-digit mobile number';
     }
     if (!formData.address.trim()) newErrors.address = 'Address/District is required';
+    if (!formData.gotra) newErrors.gotra = 'Gotra is required';
     if (!formData.profilePhoto) newErrors.profilePhoto = 'Profile photo is required';
 
     setErrors(newErrors);
@@ -63,14 +80,14 @@ export default function RegistrationForm() {
     e.preventDefault();
     if (validateForm()) {
       console.log('Form submitted with data:', formData);
-      
+
       // Save form data to localStorage for use in next step
       const formDataForStorage = {
         ...formData,
-        profilePhoto: photoPreview // Store the preview URL
+        photo: photoPreview // Store as 'photo' to match MembershipCard
       };
       localStorage.setItem('registrationData', JSON.stringify(formDataForStorage));
-      
+
       // Navigate to membership selection page
       router.push('/membership');
     }
@@ -172,19 +189,35 @@ export default function RegistrationForm() {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-primary">Personal Information</h3>
 
-              <div>
-                <label className="mb-2 block text-sm font-medium text-foreground">
-                  Full Name *
-                </label>
-                <Input
-                  placeholder="Enter your full name"
-                  value={formData.fullName}
-                  onChange={(e) => handleChange('fullName', e.target.value)}
-                  className={errors.fullName ? 'border-destructive' : ''}
-                />
-                {errors.fullName && (
-                  <p className="mt-1 text-xs text-destructive">{errors.fullName}</p>
-                )}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-foreground">
+                    First Name *
+                  </label>
+                  <Input
+                    placeholder="Enter first name"
+                    value={formData.firstName}
+                    onChange={(e) => handleChange('firstName', e.target.value)}
+                    className={errors.firstName ? 'border-destructive' : ''}
+                  />
+                  {errors.firstName && (
+                    <p className="mt-1 text-xs text-destructive">{errors.firstName}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-foreground">
+                    Last Name *
+                  </label>
+                  <Input
+                    placeholder="Enter last name"
+                    value={formData.lastName}
+                    onChange={(e) => handleChange('lastName', e.target.value)}
+                    className={errors.lastName ? 'border-destructive' : ''}
+                  />
+                  {errors.lastName && (
+                    <p className="mt-1 text-xs text-destructive">{errors.lastName}</p>
+                  )}
+                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -235,13 +268,13 @@ export default function RegistrationForm() {
                   </label>
                   <Input
                     placeholder="Enter 10-digit mobile number"
-                    value={formData.mobileNumber}
-                    onChange={(e) => handleChange('mobileNumber', e.target.value)}
-                    className={errors.mobileNumber ? 'border-destructive' : ''}
+                    value={formData.phone}
+                    onChange={(e) => handleChange('phone', e.target.value)}
+                    className={errors.phone ? 'border-destructive' : ''}
                     maxLength={10}
                   />
-                  {errors.mobileNumber && (
-                    <p className="mt-1 text-xs text-destructive">{errors.mobileNumber}</p>
+                  {errors.phone && (
+                    <p className="mt-1 text-xs text-destructive">{errors.phone}</p>
                   )}
                 </div>
 
@@ -275,13 +308,26 @@ export default function RegistrationForm() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Gothra (Optional)
+                  Gotra *
                 </label>
-                <Input
-                  placeholder="Enter your Gothra"
-                  value={formData.gothra}
-                  onChange={(e) => handleChange('gothra', e.target.value)}
-                />
+                <Select
+                  value={formData.gotra}
+                  onValueChange={(value) => handleChange('gotra', value)}
+                >
+                  <SelectTrigger className={errors.gotra ? 'border-destructive' : ''}>
+                    <SelectValue placeholder="Select your Gotra" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GOTRAS.map((gotra) => (
+                      <SelectItem key={gotra} value={gotra.toLowerCase()}>
+                        {gotra}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.gotra && (
+                  <p className="mt-1 text-xs text-destructive">{errors.gotra}</p>
+                )}
               </div>
 
               <div>
@@ -324,8 +370,6 @@ export default function RegistrationForm() {
           </form>
         </div>
       </main>
-
-
     </div>
   );
 }

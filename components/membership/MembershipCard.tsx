@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
@@ -19,12 +20,14 @@ interface MembershipCompleteData {
   lastName?: string;
   email?: string;
   phone?: string;
+  gotra?: string;
+  photo?: string;
+  address?: string;
 }
 
 export default function MembershipCard() {
   const router = useRouter();
-  const [membershipData, setMembershipData] =
-    useState<MembershipCompleteData | null>(null);
+  const [membershipData, setMembershipData] = useState<MembershipCompleteData | null>(null);
   const [membershipId, setMembershipId] = useState<string>("");
   const [showFullId, setShowFullId] = useState(false);
 
@@ -34,7 +37,6 @@ export default function MembershipCard() {
       const data = JSON.parse(storedData);
       setMembershipData(data);
 
-      // Generate unique membership ID
       const timestamp = Date.now();
       const random = Math.random().toString(36).substring(2, 8).toUpperCase();
       const generatedId = `ABBM${timestamp}${random}`;
@@ -56,12 +58,13 @@ Member ID: ${membershipId}
 Name: ${membershipData.firstName || "Member"} ${membershipData.lastName || ""}
 Email: ${membershipData.email || "N/A"}
 Phone: ${membershipData.phone || "N/A"}
+Gotra: ${membershipData.gotra ? membershipData.gotra.charAt(0).toUpperCase() + membershipData.gotra.slice(1) : "N/A"}
+Address: ${membershipData.address || "N/A"}
 Plan: ${membershipData.membershipPlan}
 Amount: ₹${membershipData.membershipPrice.toLocaleString("en-IN")}
 Transaction ID: ${membershipData.transactionId}
 
 Date of Membership: ${new Date(membershipData.paymentDate).toLocaleDateString("en-IN")}
-
 Status: Active
 
 =====================================
@@ -87,7 +90,8 @@ Valid membership card for community access
     window.print();
     toast.success("Print dialog opened");
   };
- if (!membershipData) {
+
+  if (!membershipData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-4">
@@ -108,7 +112,6 @@ Valid membership card for community access
               <CheckCircle2 className="h-12 w-12" />
             </div>
           </div>
-
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Registration Complete!
           </h1>
@@ -129,54 +132,90 @@ Valid membership card for community access
           </CardHeader>
 
           <CardContent className="space-y-6 py-8">
-            {/* Member Info */}
-            <div className="space-y-4">
+            {/* Photo and Basic Info */}
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              {/* Photo Section */}
+              <div className="flex-shrink-0">
+                {membershipData.photo ? (
+                  <img
+                    src={membershipData.photo}
+                    alt="Member"
+                    className="w-24 h-24 rounded-lg object-cover border-2 border-gray-200"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-gray-200">
+                    <span className="text-gray-400 text-xs">No Photo</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Member Info */}
+              <div className="flex-grow space-y-4">
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase">
+                    Member Name
+                  </p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {membershipData.firstName || "Member"}{" "}
+                    {membershipData.lastName || ""}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase">
+                    Gotra
+                  </p>
+                  <p className="text-sm font-medium text-gray-900 capitalize">
+                    {membershipData.gotra || "Not Specified"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase">
+                    Address
+                  </p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {membershipData.address || "Not Specified"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase">
-                  Member Name
+                  Email
                 </p>
-                <p className="text-xl font-bold text-gray-900">
-                  {membershipData.firstName || "Member"}{" "}
-                  {membershipData.lastName || ""}
+                <p className="text-sm text-gray-900 break-all">
+                  {membershipData.email || "Not Provided"}
                 </p>
               </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase">
-                    Email
-                  </p>
-                  <p className="text-sm text-gray-900 break-all">
-                    {membershipData.email || "abc@123.com"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase">
-                    Phone
-                  </p>
-                  <p className="text-sm text-gray-900">
-                    {membershipData.phone || "1233456677888"}
-                  </p>
-                </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase">
+                  Phone
+                </p>
+                <p className="text-sm text-gray-900">
+                  {membershipData.phone || "Not Provided"}
+                </p>
               </div>
+            </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase">
-                    Membership Plan
-                  </p>
-                  <p className="text-sm font-semibold text-blue-800">
-                    {membershipData.membershipPlan}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase">
-                    Amount
-                  </p>
-                  <p className="text-sm font-semibold text-blue-800">
-                    ₹{membershipData.membershipPrice.toLocaleString("en-IN")}
-                  </p>
-                </div>
+            {/* Membership Details */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase">
+                  Membership Plan
+                </p>
+                <p className="text-sm font-semibold text-blue-800">
+                  {membershipData.membershipPlan}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase">
+                  Amount
+                </p>
+                <p className="text-sm font-semibold text-blue-800">
+                  ₹{membershipData.membershipPrice.toLocaleString("en-IN")}
+                </p>
               </div>
             </div>
 
@@ -240,12 +279,11 @@ Valid membership card for community access
             <div className="border-t border-gray-200 pt-4 text-center text-xs text-gray-500">
               <p>This card is valid for community access and benefits</p>
               <p>
-                © {new Date().getFullYear()} Akhila Bharatiya Brahmana
-                Mahasangh
+                © {new Date().getFullYear()} Akhila Bharatiya Brahmana Mahasangh
               </p>
             </div>
 
-            {/* Action Buttons Inside Card */}
+            {/* Action Buttons */}
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center pt-4">
               <Button
                 type="button"
@@ -265,7 +303,6 @@ Valid membership card for community access
                 <Printer className="mr-2 h-4 w-4" />
                 Print Card
               </Button>
-          
             </div>
           </CardContent>
         </Card>
