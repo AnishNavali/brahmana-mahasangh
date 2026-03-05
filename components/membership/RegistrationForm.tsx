@@ -2,7 +2,7 @@
 'use client';
 
 import React from "react"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -56,6 +56,11 @@ export default function RegistrationForm() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [photoPreview, setPhotoPreview] = useState<string>('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -242,19 +247,25 @@ export default function RegistrationForm() {
                   <label className="mb-2 block text-sm font-medium text-foreground">
                     Gender *
                   </label>
-                  <Select
-                    value={formData.gender}
-                    onValueChange={(value) => handleChange('gender', value)}
-                  >
-                    <SelectTrigger className={errors.gender ? 'border-destructive' : ''}>
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {isMounted ? (
+                    <Select
+                      value={formData.gender}
+                      onValueChange={(value) => handleChange('gender', value)}
+                    >
+                      <SelectTrigger className={errors.gender ? 'border-destructive' : ''}>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-muted-foreground">
+                      Select gender
+                    </div>
+                  )}
                   {errors.gender && (
                     <p className="mt-1 text-xs text-destructive">{errors.gender}</p>
                   )}
@@ -310,21 +321,27 @@ export default function RegistrationForm() {
                 <label className="mb-2 block text-sm font-medium text-foreground">
                   Gotra *
                 </label>
-                <Select
-                  value={formData.gotra}
-                  onValueChange={(value) => handleChange('gotra', value)}
-                >
-                  <SelectTrigger className={errors.gotra ? 'border-destructive' : ''}>
-                    <SelectValue placeholder="Select your Gotra" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {GOTRAS.map((gotra) => (
-                      <SelectItem key={gotra} value={gotra.toLowerCase()}>
-                        {gotra}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isMounted ? (
+                  <Select
+                    value={formData.gotra}
+                    onValueChange={(value) => handleChange('gotra', value)}
+                  >
+                    <SelectTrigger className={errors.gotra ? 'border-destructive' : ''}>
+                      <SelectValue placeholder="Select your Gotra" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GOTRAS.map((gotra) => (
+                        <SelectItem key={gotra} value={gotra.toLowerCase()}>
+                          {gotra}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-muted-foreground">
+                    Select your Gotra
+                  </div>
+                )}
                 {errors.gotra && (
                   <p className="mt-1 text-xs text-destructive">{errors.gotra}</p>
                 )}
