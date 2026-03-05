@@ -6,8 +6,17 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Printer, CheckCircle2 } from "lucide-react";
+import { Download, Printer, CheckCircle2, ChevronDown, ImageIcon, FileJson, FileText } from "lucide-react";
 import { toast } from "sonner";
+import * as htmlToImage from "html-to-image";
+import jsPDF from "jspdf";
+import { useRef } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface MembershipCompleteData {
   membershipType: string;
@@ -30,6 +39,8 @@ export default function MembershipCard() {
   const [membershipData, setMembershipData] = useState<MembershipCompleteData | null>(null);
   const [membershipId, setMembershipId] = useState<string>("");
   const [showFullId, setShowFullId] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const storedData = localStorage.getItem("membershipComplete");
@@ -46,7 +57,96 @@ export default function MembershipCard() {
     }
   }, [router]);
 
-  const handleDownload = () => {
+  const downloadFile = (dataUrl: string, filename: string) => {
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadImage = async (format: "png" | "jpeg") => {
+    if (!cardRef.current) return;
+    setIsDownloading(true);
+
+    try {
+      let dataUrl: string;
+      if (format === "png") {
+        dataUrl = await htmlToImage.toPng(cardRef.current, {
+          backgroundColor: "#ffffff",
+          pixelRatio: 2,
+          cacheBust: true,
+        });
+      } else {
+        dataUrl = await htmlToImage.toJpeg(cardRef.current, {
+          backgroundColor: "#ffffff",
+          pixelRatio: 2,
+          quality: 0.95,
+          cacheBust: true,
+        });
+      }
+
+      downloadFile(dataUrl, `membership_${membershipId}.${format}`);
+      toast.success(`Card downloaded as ${format.toUpperCase()}!`);
+    } catch (error) {
+      console.error("Image export error:", error);
+      toast.error("Failed to download image");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!cardRef.current) return;
+    setIsDownloading(true);
+
+    try {
+      const dataUrl = await htmlToImage.toPng(cardRef.current, {
+        backgroundColor: "#ffffff",
+        pixelRatio: 2,
+        cacheBust: true,
+      });
+
+      // Create an image to get dimensions
+      const img = new window.Image();
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = dataUrl;
+      });
+
+      const imgWidth = img.width;
+      const imgHeight = img.height;
+
+      // A4 dimensions in points (72 DPI)
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 40;
+      const contentWidth = pageWidth - margin * 2;
+
+      // Scale image to fit page width
+      const scale = contentWidth / imgWidth;
+      const scaledHeight = imgHeight * scale;
+
+      pdf.addImage(dataUrl, "PNG", margin, margin, contentWidth, scaledHeight);
+      pdf.save(`membership_${membershipId}.pdf`);
+      toast.success("Card downloaded as PDF!");
+    } catch (error) {
+      console.error("PDF export error:", error);
+      toast.error("Failed to download PDF");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleDownloadText = () => {
     if (!membershipData) return;
 
     const content = `
@@ -83,7 +183,7 @@ Valid membership card for community access
     element.click();
     document.body.removeChild(element);
 
-    toast.success("Card downloaded successfully!");
+    toast.success("Card downloaded as Text!");
   };
 
   const handlePrint = () => {
@@ -121,7 +221,7 @@ Valid membership card for community access
         </div>
 
         {/* Membership Card */}
-        <Card className="border-2 border-blue-600 shadow-xl mb-6">
+        <Card ref={cardRef} className="border-2 border-blue-600 shadow-xl mb-6 bg-white overflow-hidden">
           <CardHeader className="bg-blue-800 text-white">
             <CardTitle className="text-center text-2xl">
               Akhila Bharatiya Brahmana Mahasangh
@@ -284,16 +384,39 @@ Valid membership card for community access
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center pt-4">
-              <Button
-                type="button"
-                onClick={handleDownload}
-                variant="outline"
-                className="border-2 border-blue-700 text-blue-700 hover:bg-blue-50 bg-white"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download Card
-              </Button>
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center pt-4 no-print">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isDownloading}
+                    className="border-2 border-blue-700 text-blue-700 hover:bg-blue-50 bg-white"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    {isDownloading ? "Generating..." : "Download Card"}
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-48 bg-white">
+                  <DropdownMenuItem onClick={() => handleDownloadImage("png")} className="cursor-pointer">
+                    <ImageIcon className="mr-2 h-4 w-4 text-blue-600" />
+                    <span>Download PNG</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownloadImage("jpeg")} className="cursor-pointer">
+                    <ImageIcon className="mr-2 h-4 w-4 text-blue-600" />
+                    <span>Download JPG</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDownloadPDF} className="cursor-pointer">
+                    <FileText className="mr-2 h-4 w-4 text-red-600" />
+                    <span>Download PDF</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDownloadText} className="cursor-pointer">
+                    <FileJson className="mr-2 h-4 w-4 text-gray-600" />
+                    <span>Download Text</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 type="button"
                 onClick={handlePrint}

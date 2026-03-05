@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +49,11 @@ export default function PaymentScreen({ membershipData }: PaymentScreenProps) {
   const [bankSelected, setBankSelected] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const validateCardData = () => {
     const newErrors: Record<string, string> = {};
@@ -262,14 +267,14 @@ export default function PaymentScreen({ membershipData }: PaymentScreenProps) {
                     });
                   }}
                   className={`p-4 rounded-lg border-2 transition-all ${paymentMethod === "card"
-                      ? "border-blue-600 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                    ? "border-blue-600 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300"
                     }`}
                 >
                   <CreditCard
                     className={`mx-auto mb-2 ${paymentMethod === "card"
-                        ? "text-blue-600"
-                        : "text-gray-400"
+                      ? "text-blue-600"
+                      : "text-gray-400"
                       }`}
                     size={24}
                   />
@@ -289,14 +294,14 @@ export default function PaymentScreen({ membershipData }: PaymentScreenProps) {
                     });
                   }}
                   className={`p-4 rounded-lg border-2 transition-all ${paymentMethod === "upi"
-                      ? "border-blue-600 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                    ? "border-blue-600 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300"
                     }`}
                 >
                   <Smartphone
                     className={`mx-auto mb-2 ${paymentMethod === "upi"
-                        ? "text-blue-600"
-                        : "text-gray-400"
+                      ? "text-blue-600"
+                      : "text-gray-400"
                       }`}
                     size={24}
                   />
@@ -314,14 +319,14 @@ export default function PaymentScreen({ membershipData }: PaymentScreenProps) {
                     });
                   }}
                   className={`p-4 rounded-lg border-2 transition-all ${paymentMethod === "bank"
-                      ? "border-blue-600 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                    ? "border-blue-600 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300"
                     }`}
                 >
                   <Building2
                     className={`mx-auto mb-2 ${paymentMethod === "bank"
-                        ? "text-blue-600"
-                        : "text-gray-400"
+                      ? "text-blue-600"
+                      : "text-gray-400"
                       }`}
                     size={24}
                   />
@@ -491,25 +496,31 @@ export default function PaymentScreen({ membershipData }: PaymentScreenProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Select Your Bank *
                   </label>
-                  <Select value={bankSelected} onValueChange={setBankSelected}>
-                    <SelectTrigger
-                      className={
-                        errors.bankSelected
-                          ? "border-red-500"
-                          : "border-gray-300"
-                      }
-                    >
-                      <SelectValue placeholder="Choose your bank" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="icici">ICICI Bank</SelectItem>
-                      <SelectItem value="hdfc">HDFC Bank</SelectItem>
-                      <SelectItem value="sbi">State Bank of India</SelectItem>
-                      <SelectItem value="axis">Axis Bank</SelectItem>
-                      <SelectItem value="kotak">Kotak Mahindra Bank</SelectItem>
-                      <SelectItem value="pnb">Punjab National Bank</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {isMounted ? (
+                    <Select value={bankSelected} onValueChange={setBankSelected}>
+                      <SelectTrigger
+                        className={
+                          errors.bankSelected
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }
+                      >
+                        <SelectValue placeholder="Choose your bank" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="icici">ICICI Bank</SelectItem>
+                        <SelectItem value="hdfc">HDFC Bank</SelectItem>
+                        <SelectItem value="sbi">State Bank of India</SelectItem>
+                        <SelectItem value="axis">Axis Bank</SelectItem>
+                        <SelectItem value="kotak">Kotak Mahindra Bank</SelectItem>
+                        <SelectItem value="pnb">Punjab National Bank</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm text-muted-foreground">
+                      Choose your bank
+                    </div>
+                  )}
                   {errors.bankSelected && (
                     <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
                       <AlertCircle className="size-3" />
