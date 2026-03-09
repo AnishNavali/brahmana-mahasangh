@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import Link from "next/link"
 
 export interface MenuBarItem {
@@ -33,9 +33,9 @@ export function MenuBar({ items, className, activeIndex, ...props }: MenuBarProp
       const menuRect = menuRef.current.getBoundingClientRect()
       const itemRect = menuItem.getBoundingClientRect()
       const tooltipRect = tooltipRef.current.getBoundingClientRect()
-    
+
       const left = itemRect.left - menuRect.left + (itemRect.width - tooltipRect.width) / 2
-    
+
       setTooltipPosition({
         left: Math.max(0, Math.min(left, menuRect.width - tooltipRect.width)),
         width: tooltipRect.width
@@ -76,8 +76,8 @@ export function MenuBar({ items, className, activeIndex, ...props }: MenuBarProp
           </motion.div>
         )}
       </AnimatePresence>
-      
-      <div 
+
+      <div
         ref={menuRef}
         className={cn(
           "h-10 px-1.5 inline-flex justify-center items-center gap-[3px] overflow-hidden z-10",

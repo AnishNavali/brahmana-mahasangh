@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import PaymentScreen from '@/components/membership/PaymentScreen';
+import PaymentScreen from '../../components/membership/PaymentScreen';
 import { useRouter } from 'next/navigation';
 
 export default function PaymentPage() {
@@ -34,5 +34,19 @@ export default function PaymentPage() {
     );
   }
 
-  return <PaymentScreen membershipData={membershipData} />;
+  return (
+    <div className="flex flex-col w-full pb-20 font-sans">
+      <section className="bg-[#89151e] py-16 text-white text-center">
+        <h1 className="text-4xl font-black uppercase tracking-widest leading-tight">Payment</h1>
+        <div className="flex justify-center gap-2 mt-4 text-[11px] font-bold uppercase text-white/70 tracking-[0.2em]">
+          <a href="/" className="hover:text-white transition-colors">Home</a>
+          <span>/</span>
+          <span className="text-white">Payment</span>
+        </div>
+      </section>
+      <div className="container mx-auto py-12 px-4">
+        <PaymentScreen membershipData={membershipData} />
+      </div>
+    </div>
+  );
 }

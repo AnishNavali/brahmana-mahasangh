@@ -4,8 +4,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Download, Printer, CheckCircle2, ChevronDown, ImageIcon, FileJson, FileText } from "lucide-react";
 import { toast } from "sonner";
 import * as htmlToImage from "html-to-image";
@@ -16,7 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 
 interface MembershipCompleteData {
   membershipType: string;
@@ -146,45 +146,7 @@ export default function MembershipCard() {
     }
   };
 
-  const handleDownloadText = () => {
-    if (!membershipData) return;
 
-    const content = `
-Akhila Bharatiya Brahmana Mahasangh
-MEMBERSHIP CARD
-=====================================
-
-Member ID: ${membershipId}
-Name: ${membershipData.firstName || "Member"} ${membershipData.lastName || ""}
-Email: ${membershipData.email || "N/A"}
-Phone: ${membershipData.phone || "N/A"}
-Gotra: ${membershipData.gotra ? membershipData.gotra.charAt(0).toUpperCase() + membershipData.gotra.slice(1) : "N/A"}
-Address: ${membershipData.address || "N/A"}
-Plan: ${membershipData.membershipPlan}
-Amount: ₹${membershipData.membershipPrice.toLocaleString("en-IN")}
-Transaction ID: ${membershipData.transactionId}
-
-Date of Membership: ${new Date(membershipData.paymentDate).toLocaleDateString("en-IN")}
-Status: Active
-
-=====================================
-Valid membership card for community access
-© ${new Date().getFullYear()} Akhila Bharatiya Brahmana Mahasangh
-    `;
-
-    const element = document.createElement("a");
-    element.setAttribute(
-      "href",
-      "data:text/plain;charset=utf-8," + encodeURIComponent(content)
-    );
-    element.setAttribute("download", `membership_${membershipId}.txt`);
-    element.style.display = "none";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-
-    toast.success("Card downloaded as Text!");
-  };
 
   const handlePrint = () => {
     window.print();
@@ -193,7 +155,7 @@ Valid membership card for community access
 
   if (!membershipData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className=" flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
           <p className="text-gray-600">Loading membership details...</p>
@@ -203,263 +165,164 @@ Valid membership card for community access
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Success Icon and Title */}
-        <div className="text-center mb-8">
+    <div className="min-h-screen bg-gray-50 py-12 px-4 print:bg-white print:py-0">
+      <div className="max-w-3xl mx-auto flex flex-col items-center">
+        {/* Success Header (Hidden on print) */}
+        <div className="text-center mb-10 no-print">
           <div className="mb-4 flex justify-center">
-            <div className="rounded-full bg-orange-500 p-4 text-white">
-              <CheckCircle2 className="h-12 w-12" />
+            <div className="rounded-full bg-orange-500 p-4 text-white shadow-md">
+              <CheckCircle2 className="h-10 w-10" />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Registration Complete!
           </h1>
-          <p className="text-lg text-gray-600">
-            Your membership has been activated successfully
+          <p className="text-gray-600">
+            You can now download or print your membership card below
           </p>
         </div>
 
-        {/* Membership Card */}
-        <Card ref={cardRef} className="border-2 border-blue-600 shadow-xl mb-6 bg-white overflow-hidden">
-          <CardHeader className="bg-blue-800 text-white">
-            <CardTitle className="text-center text-2xl">
-              Akhila Bharatiya Brahmana Mahasangh
-            </CardTitle>
-            <p className="mt-2 text-center text-sm font-semibold">
-              MEMBER CARD
-            </p>
-          </CardHeader>
+        {/* Simplified Membership Card - PAN Card Size (approx 400x252px) */}
+        <div ref={cardRef} className="no-shadow print:shadow-none">
+          <Card className="w-[500px] h-[302px] border-2 border-blue-800 bg-white overflow-hidden shadow-xl rounded-xl">
+            <CardHeader className="bg-blue-800 text-white p-3">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-white rounded-full p-1 border border-blue-900">
+                  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <CardTitle className="text-[12px] font-bold leading-tight">
+                    Akhila Bharatiya Brahmana Mahasangh
+                  </CardTitle>
+                  <p className="text-[10px] font-medium opacity-90 tracking-widest uppercase">
+                    Membership ID Card
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
 
-          <CardContent className="space-y-6 py-8">
-            {/* Photo and Basic Info */}
-            <div className="flex flex-col sm:flex-row gap-6 items-start">
+            <CardContent className="p-4 flex gap-4 h-[calc(252px-64px)]">
               {/* Photo Section */}
               <div className="flex-shrink-0">
-                {membershipData.photo ? (
-                  <img
-                    src={membershipData.photo}
-                    alt="Member"
-                    className="w-24 h-24 rounded-lg object-cover border-2 border-gray-200"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-gray-200">
-                    <span className="text-gray-400 text-xs">No Photo</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Member Info */}
-              <div className="flex-grow space-y-4">
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase">
-                    Member Name
-                  </p>
-                  <p className="text-xl font-bold text-gray-900">
-                    {membershipData.firstName || "Member"}{" "}
-                    {membershipData.lastName || ""}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase">
-                    Gotra
-                  </p>
-                  <p className="text-sm font-medium text-gray-900 capitalize">
-                    {membershipData.gotra || "Not Specified"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase">
-                    Address
-                  </p>
-                  <p className="text-sm font-medium text-gray-900">
-                    {membershipData.address || "Not Specified"}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Contact Information */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase">
-                  Email
-                </p>
-                <p className="text-sm text-gray-900 break-all">
-                  {membershipData.email || "Not Provided"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase">
-                  Phone
-                </p>
-                <p className="text-sm text-gray-900">
-                  {membershipData.phone || "Not Provided"}
-                </p>
-              </div>
-            </div>
-
-            {/* Membership Details */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase">
-                  Membership Plan
-                </p>
-                <p className="text-sm font-semibold text-blue-800">
-                  {membershipData.membershipPlan}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase">
-                  Amount
-                </p>
-                <p className="text-sm font-semibold text-blue-800">
-                  ₹{membershipData.membershipPrice.toLocaleString("en-IN")}
-                </p>
-              </div>
-            </div>
-
-            {/* Membership ID Section */}
-            <div className="border-t-2 border-b-2 border-gray-200 py-6">
-              <div className="text-center">
-                <p className="mb-2 text-xs font-semibold text-gray-500 uppercase">
-                  Membership ID
-                </p>
-                <div className="mb-4">
-                  {showFullId ? (
-                    <p className="font-mono text-2xl font-bold text-blue-800 tracking-wider break-all">
-                      {membershipId}
-                    </p>
+                <div className="w-[90px] h-[110px] bg-gray-100 border-2 border-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                  {membershipData.photo ? (
+                    <img
+                      src={membershipData.photo}
+                      alt="Member"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
-                    <p className="font-mono text-2xl font-bold text-blue-800 tracking-widest">
-                      {membershipId.slice(0, 8)}...
-                    </p>
+                    <ImageIcon className="w-8 h-8 text-gray-300" />
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowFullId(!showFullId)}
-                  className="text-xs text-blue-700 hover:underline font-medium"
-                >
-                  {showFullId ? "Hide" : "Show"} Full ID
-                </button>
+                <div className="mt-3 text-center">
+                  <span className="inline-block px-3 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-bold uppercase border border-orange-200">
+                    Active
+                  </span>
+                </div>
               </div>
-            </div>
 
-            {/* Additional Details */}
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Date of Membership:</span>
+              {/* Data Section */}
+              <div className="flex-grow flex flex-col space-y-3.5 pt-1">
+                <div>
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Member Name</p>
+                  <p className="text-[16px] font-extrabold text-blue-900 leading-none truncate">
+                    {membershipData.firstName || "Member"} {membershipData.lastName || ""}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Membership ID</p>
+                  <p className="text-[13px] font-mono font-bold text-gray-800 leading-none">
+                    {membershipId}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Gotra</p>
+                    <p className="text-[12px] font-bold text-gray-800 leading-none capitalize truncate">
+                      {membershipData.gotra || "N/A"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Phone</p>
+                    <p className="text-[12px] font-bold text-gray-800 leading-none">
+                      {membershipData.phone || "N/A"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer seal or logo watermark */}
+                <div className="mt-auto flex justify-between items-end pb-1 border-t border-gray-100 pt-2">
+                  <p className="text-[8px] text-gray-400 italic font-medium">Original Member Identification</p>
+                  <CheckCircle2 className="h-4 w-4 text-blue-800/20" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Additional Member Info (Reference Only) */}
+        <div className="mt-8 w-full max-w-lg no-print">
+          <Card className="bg-gray-50 border-dashed border-2">
+            <CardContent className="p-5">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Registration Details</h3>
+              <div className="grid grid-cols-2 gap-y-3 text-sm">
+                <span className="text-gray-500">Email:</span>
+                <span className="font-semibold text-gray-900">{membershipData.email || "N/A"}</span>
+
+                <span className="text-gray-500">Address/Dist:</span>
+                <span className="font-semibold text-gray-900">{membershipData.address || "N/A"}</span>
+
+                <span className="text-gray-500">Plan:</span>
+                <span className="font-semibold text-blue-700">{membershipData.membershipPlan}</span>
+
+                <span className="text-gray-500">Amount:</span>
+                <span className="font-semibold text-gray-900">₹{membershipData.membershipPrice.toLocaleString("en-IN")}</span>
+
+                <span className="text-gray-500">Txn Date:</span>
                 <span className="font-semibold text-gray-900">
-                  {new Date(membershipData.paymentDate).toLocaleDateString(
-                    "en-IN",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    }
-                  )}
+                  {new Date(membershipData.paymentDate).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                  })}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Transaction ID:</span>
-                <span className="font-semibold text-gray-900">
-                  {membershipData.transactionId}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Status:</span>
-                <span className="inline-block rounded-full bg-orange-100 px-3 py-1 text-orange-600 font-semibold text-xs">
-                  Active
-                </span>
-              </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Footer */}
-            <div className="border-t border-gray-200 pt-4 text-center text-xs text-gray-500">
-              <p>This card is valid for community access and benefits</p>
-              <p>
-                © {new Date().getFullYear()} Akhila Bharatiya Brahmana Mahasangh
-              </p>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 mt-6">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="default" className="flex-1 bg-blue-800 hover:bg-blue-900" size="lg">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Card
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-white">
+                <DropdownMenuItem onClick={() => handleDownloadImage("png")}>
+                  <ImageIcon className="mr-2 h-4 w-4" /> PNG Image
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDownloadPDF}>
+                  <FileText className="mr-2 h-4 w-4" /> PDF Document
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center pt-4 no-print">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={isDownloading}
-                    className="border-2 border-blue-700 text-blue-700 hover:bg-blue-50 bg-white"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    {isDownloading ? "Generating..." : "Download Card"}
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-48 bg-white">
-                  <DropdownMenuItem onClick={() => handleDownloadImage("png")} className="cursor-pointer">
-                    <ImageIcon className="mr-2 h-4 w-4 text-blue-600" />
-                    <span>Download PNG</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDownloadImage("jpeg")} className="cursor-pointer">
-                    <ImageIcon className="mr-2 h-4 w-4 text-blue-600" />
-                    <span>Download JPG</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDownloadPDF} className="cursor-pointer">
-                    <FileText className="mr-2 h-4 w-4 text-red-600" />
-                    <span>Download PDF</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDownloadText} className="cursor-pointer">
-                    <FileJson className="mr-2 h-4 w-4 text-gray-600" />
-                    <span>Download Text</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button
-                type="button"
-                onClick={handlePrint}
-                variant="outline"
-                className="border-2 border-blue-700 text-blue-700 hover:bg-blue-50 bg-white"
-              >
-                <Printer className="mr-2 h-4 w-4" />
-                Print Card
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            <Button variant="outline" className="flex-1 border-2 border-blue-800 text-blue-800" size="lg" onClick={handlePrint}>
+              <Printer className="mr-2 h-4 w-4" />
+              Print Card
+            </Button>
+          </div>
+        </div>
 
-        {/* Support Information */}
-        <Card className="border border-gray-200">
-          <CardContent className="pt-6">
-            <h3 className="mb-2 font-semibold text-gray-900">Need Help?</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              If you have any questions about your membership or encounter any
-              issues, please contact us:
-            </p>
-            <div className="space-y-1 text-sm">
-              <p className="text-gray-900">
-                Email:{" "}
-                <a
-                  href="mailto:support@abbm.org"
-                  className="text-blue-700 hover:underline font-medium"
-                >
-                  support@abbm.org
-                </a>
-              </p>
-              <p className="text-gray-900">
-                Phone:{" "}
-                <a
-                  href="tel:+91-1234-567890"
-                  className="text-blue-700 hover:underline font-medium"
-                >
-                  +91-1234-567890
-                </a>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mt-8 text-center text-xs text-gray-400 no-print">
+          <p>© {new Date().getFullYear()} Akhila Bharatiya Brahmana Mahasangh</p>
+          <p className="mt-1">For support, please contact support@abbm.org</p>
+        </div>
       </div>
     </div>
   );

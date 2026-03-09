@@ -5,15 +5,15 @@ import React from "react"
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '../ui/select';
 
 export interface MembershipData {
   firstName: string;
@@ -94,7 +94,7 @@ export default function RegistrationForm() {
       localStorage.setItem('registrationData', JSON.stringify(formDataForStorage));
 
       // Navigate to membership selection page
-      router.push('/membership');
+      router.push('/membership-plan');
     }
   };
 
@@ -156,27 +156,6 @@ export default function RegistrationForm() {
 
   return (
     <div className="bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto max-w-xl px-4 py-3">
-          <div className="flex items-center justify-center gap-4">
-            <Image
-              src="/logo.png"
-              alt="Akhila Bharatiya Brahmana Mahasangh Logo"
-              width={60}
-              height={60}
-              className="object-contain"
-            />
-            <div className="flex flex-col justify-center">
-              <h1 className="text-3xl font-bold text-primary">
-                Akhila Bharatiya Brahmana Mahasangh
-              </h1>
-              <p className="text-muted-foreground">Membership Registration Portal</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="mx-auto max-w-2xl px-4 py-8">
         <div className="rounded-lg bg-card p-8 shadow-sm">

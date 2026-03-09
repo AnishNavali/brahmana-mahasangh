@@ -1,6 +1,6 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import MarkDown from "react-markdown"
 import rehypeRaw from "rehype-raw"

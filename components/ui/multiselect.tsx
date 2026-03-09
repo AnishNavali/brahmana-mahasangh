@@ -4,7 +4,7 @@ import { Command as CommandPrimitive, useCommandState } from "cmdk"
 import * as React from "react"
 import { forwardRef, useEffect } from "react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import {
   Command,
   CommandGroup,
@@ -557,7 +557,7 @@ const MultipleSelector = React.forwardRef<
                   disabled ||
                   selected.length < 1 ||
                   selected.filter((s) => s.fixed).length === selected.length) &&
-                  "hidden",
+                "hidden",
               )}
               aria-label="Clear all"
             >
@@ -631,7 +631,7 @@ const MultipleSelector = React.forwardRef<
                                 className={cn(
                                   "cursor-pointer",
                                   option.disable &&
-                                    "cursor-not-allowed opacity-50",
+                                  "cursor-not-allowed opacity-50",
                                 )}
                               >
                                 {option.label}

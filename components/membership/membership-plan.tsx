@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import {
   Card,
   Header,
@@ -17,7 +17,7 @@ import {
   List,
   ListItem,
   Separator,
-} from '@/components/pricing-card';
+} from '../pricing-card';
 import { Check, Sparkles, Crown, Zap } from 'lucide-react';
 
 interface MembershipPlan {
@@ -155,9 +155,8 @@ export function MembershipSelection() {
           {MEMBERSHIP_PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative transition-all duration-300 ${
-                selectedPlan === plan.id ? 'scale-105' : 'hover:scale-102'
-              }`}
+              className={`relative transition-all duration-300 ${selectedPlan === plan.id ? 'scale-105' : 'hover:scale-102'
+                }`}
             >
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
@@ -168,13 +167,12 @@ export function MembershipSelection() {
               )}
 
               <Card
-                className={`cursor-pointer transition-all duration-300 ${
-                  plan.highlighted
+                className={`cursor-pointer transition-all duration-300 ${plan.highlighted
                     ? 'ring-2 ring-primary shadow-2xl shadow-primary/20'
                     : selectedPlan === plan.id
-                    ? 'ring-2 ring-primary/50'
-                    : 'hover:ring-2 hover:ring-primary/30'
-                }`}
+                      ? 'ring-2 ring-primary/50'
+                      : 'hover:ring-2 hover:ring-primary/30'
+                  }`}
                 onClick={() => setSelectedPlan(plan.id)}
               >
                 <Header glassEffect={true}>
@@ -223,13 +221,12 @@ export function MembershipSelection() {
                       e.stopPropagation();
                       handleSelect(plan);
                     }}
-                    className={`w-full mt-6 transition-all duration-300 ${
-                      selectedPlan === plan.id
+                    className={`w-full mt-6 transition-all duration-300 ${selectedPlan === plan.id
                         ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
                         : plan.highlighted
-                        ? 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/30'
-                        : 'bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground'
-                    }`}
+                          ? 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/30'
+                          : 'bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground'
+                      }`}
                     size="lg"
                   >
                     {selectedPlan === plan.id ? (
